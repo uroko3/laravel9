@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestController;
+use NunoMaduro\Collision\Adapters\Laravel\Commands\TestCommand;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +20,7 @@ Route::get('/', function () {
 });
 
 Route::get('test', [TestController::class, 'index'])->name('test.index');
+Route::get('test/input', [TestController::class, 'input'])->name('test.input');
+Route::post('test/store', [TestController::class, 'store'])->name('test.store');
+Route::get('test/edit/{test}', [TestController::class, 'edit'])->name('test.edit');
+Route::post('test/update/{test}', [TestController::class, 'update'])->name('test.update');

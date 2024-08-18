@@ -1,3 +1,72 @@
+# テーブル作成コマンド
+使用例 (テーブル名：tests)
+php artisan make:migration create_tests_table
+
+database\migrations/2024_08_18_090926_create_tests_table.php
+が作成されるので編集
+
+public function up()
+{
+    Schema::create('tests', function (Blueprint $table) {
+        $table->id();
+        $table->string('name');
+        $table->timestamps();
+    });
+}
+
+など。
+
+編集したら、
+
+php artisan migrate
+
+# モデル作成コマンド
+使用例（モデル名Test）
+php artisan make:model Test
+
+モデル作成したら編集
+fillableかguardedにカラム名を指定する。
+fillableは更新可カラムを記述。
+guardedは更新不可カラムを記述。
+
+protected $fillable = [
+    'name',
+];
+
+/*
+protected $guarded = [
+    
+];
+*/
+
+# リクエスト作成コマンド
+使用例（リクエスト名Test）
+php artisan make:request TestRequest
+
+リクエスト作成したら以下をtrueにする。
+
+public function authorize()
+{
+    return true;
+}
+
+バリデーションルールや対応するメッセージは以下のように書く
+public function rules()
+{
+    return [
+        'name' => 'required|max:10',
+    ];
+}
+
+public function messages() {
+    return [
+        'name.required' => 'なまえはひっす',
+        'name.max' => 'なまえは10もじいないで',
+    ];
+}
+
+
+
 # チェックボックスコンポーネント利用
 <x-checkbox-input name="hoge[]" value="{{hoge}}" :default="$hoge_default" />チェックボックス
 
