@@ -71,16 +71,18 @@ public function messages() {
 <x-checkbox-input name="hoge[]" value="{{hoge}}" :default="$hoge_default" />チェックボックス
 
 # ポリシー作るときのコマンド
-php artisan make:policy HogePolicy --model=Hoge
+使用例（モデル名Testに対するポリシー作成）
+php artisan make:policy TestPolicy --model=Test
 
 ※作成されるポリシーファイルの各メソッドの
 第一引数は、ログインしているUserモデルのインスタンス
-第二引数は、Hogeモデルのインスタンス(更新対象のモデル）
+第二引数は、Testモデルのインスタンス(更新対象のモデル）
 各メソッドには、booleanをreturnするように処理を書き足す。
 
 コントローラのアクションなどから
-$this->authorize('update', $m_hoge);
+$this->authorize('update', $test);
 と呼び出す。
+$testはTestモデルのインスタンス。
 
 # オリジナルlayoutファイルを作成する
 
