@@ -25,6 +25,7 @@ class TestRequest extends FormRequest
     {
         return [
             'name' => 'required|max:10',
+            'radio' => 'required',
         ];
     }
     
@@ -32,6 +33,7 @@ class TestRequest extends FormRequest
         return [
             'name.required' => 'なまえはひっす',
             'name.max' => 'なまえは10もじいないで',
+            'radio' => 'radioは必須です',
         ];
     }
 }
