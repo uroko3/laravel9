@@ -1,3 +1,6 @@
+#デバッグバーインストール
+composer require barryvdh/laravel-debugbar --dev
+
 # テーブル作成コマンド
 使用例 (テーブル名：tests)
 php artisan make:migration create_tests_table
@@ -19,6 +22,36 @@ public function up()
 編集したら、
 
 php artisan migrate
+
+# テーブルカラム追加コマンド
+// 構文
+php artisan make:migration 任意のマイグレーション名 --table=テーブル名
+
+// 例 usersテーブルにroleカラムを追加
+php artisan make:migration add_column_role_users_table --table=users
+
+2024_08_24_071352_add_column_role_users_table.php
+が作成されるので編集
+
+//roleカラムをTINYINT型でpasswordカラムの後に追加
+public function up()
+{
+	Schema::table('users', function (Blueprint $table) {
+	  $table->tinyInteger('role')->default(0)->after('password')->comment('権限');
+	});
+}
+
+// roleカラムの削除を同時に追加
+public function down()
+{
+    Schema::table('users', function (Blueprint $table) {
+      $table->dropColumn('role');
+    });
+}
+
+//artisanコマンドでマイグレーションを実行
+php artisan migrate
+
 
 # モデル作成コマンド
 使用例（モデル名Test）
