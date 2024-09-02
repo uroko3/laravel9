@@ -169,3 +169,105 @@ layouts/hoge.blade.php
 {{$hogeMessage}}
 で参照できる。
 
+# flash系（一時的なメッセージ）
+コントローラでは、以下のように書ける。
+
+//\Session::flash('message', '更新しました'); // withのかわりにこれでもいい
+//$request->session()->flash('message', '更新しました'); // withのかわりにこれでもいい
+        
+return redirect(route('user.index'))->with('message', '更新しました');
+
+
+viewでは、以下のように書く
+@if (session('message'))
+    <div>
+        {{ session('message') }}
+    </div>
+@endif
+
+# バリデーション系
+viewでは、以下のように書く
+
+@if ($errors->any())
+<div>
+	<ul>
+		@foreach ($errors->all() as $error)
+			<li>{{ $error }}</li>
+		@endforeach
+	</ul>
+</div>
+@endif
+
+# 連関テーブル
+https://readouble.com/laravel/9.x/ja/eloquent-relationships.html#many-to-many
+例）リレーション
+users --> hobby_user <-- hobbies
+
+hobby_userは連関テーブル
+この名前は、hobbiesとusersの単数形のアルファベット順で命名する。
+このルール以外の名前をつける場合は、リレーション設定時に連関テーブル名を明示する必要がある。
+
+テーブル構造
+
+users
+id（主キー）
+
+hobbies
+id（主キー）
+
+hobby_user
+user_id（usersの主キー）（外部キー）
+hobby_id（hobbiesの主キー）（外部キー）
+
+hobby_userにidは特にいらない。
+hobby_userの主キーはuser_id,hobby_idの複合主キーにする。
+各外部キーはforeign_key設定なしでもlaravel上は問題なくリレーションが機能する
+
+usersテーブルはすでに存在する前提
+php artisan make:migration create_hobbies_table
+php artisan make:migration create_hobby_user table
+
+▼hobbiesテーブル
+public function up()
+{
+    Schema::create('hobbies', function (Blueprint $table) {
+        $table->id();
+        $table->string('name');
+        $table->timestamps();
+    });
+}
+
+▼hobby_userテーブル
+public function up()
+{
+    Schema::create('hobby_user', function (Blueprint $table) {
+        $table->unsignedBigInteger('user_id');
+        $table->unsignedBigInteger('hobby_id');
+        $table->primary(['user_id', 'hobby_id']);
+    });
+}
+
+php artisan migrate
+
+php artisan make:model Hobby
+
+▼Hobbyモデルに以下追加
+protected $fillable = [
+   'name',
+];
+
+public function users()
+{
+	// テーブル名、カラム名のルールに則っていれば第一引数のみでよい
+    return $this->belongsToMany(User::class, 'hobby_user', 'hobby_id', 'user_id');
+}
+
+▼Userモデルに以下追加
+public function hobbies()
+{
+	// テーブル名、カラム名のルールに則っていれば第一引数のみでよい
+    return $this->belongsToMany(Hobby::class, 'hobby_user', 'user_id', 'hobby_id');
+}
+
+
+

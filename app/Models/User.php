@@ -42,4 +42,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    
+    public function hobbies()
+    {
+        // テーブル名、カラム名のルールに則っていれば第一引数のみでよい
+        return $this->belongsToMany(Hobby::class, 'hobby_user', 'user_id', 'hobby_id');
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Hobby;
 
 class UserController extends Controller
 {
@@ -13,7 +14,8 @@ class UserController extends Controller
     }
     
     public function edit(User $user) {
-        return view('user.edit', compact('user'));
+        $hobbies = Hobby::all();
+        return view('user.edit', compact('user', 'hobbies'));
     }
     
     public function update(Request $request, User $user) {
