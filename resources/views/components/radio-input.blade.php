@@ -3,4 +3,9 @@
 	'value' => '',
 	'default' => [],
 ])
-<input type="radio" name="{{$name}}" value="{{$value}}" {!! $attributes->merge(['class' => '']) !!}{{ in_array((string)$value, array_map('strval', (array)old(str_replace(['[',']'], ['.',''], preg_replace("/\[\s*\]/", '', $name)), $default)), true) ? ' checked' : '' }}>
+@php
+	$old_key = str_replace(['[', ']'], ['.', ''], preg_replace("/\[\s*\]/", '', $name));
+	$old_val = $errors->any()?(array)old($old_key):(array)old($old_key, $default);
+	$boolean = in_array((string)$value, array_map('strval', $old_val), true);
+@endphp
+<input type="radio" name="{{$name}}" value="{{$value}}" {!! $attributes->merge(['class' => '']) !!}{{ $boolean ? ' checked' : '' }}>
