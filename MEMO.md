@@ -269,5 +269,9 @@ public function hobbies()
     return $this->belongsToMany(Hobby::class, 'hobby_user', 'user_id', 'hobby_id');
 }
 
+▼rsyncでファイルコピー
+rsync -auvz --delete -e ssh '/hoge/hoge.html' 'host:/hoge2/hoge2.html'
 
+▼ssh + dd でファイルコピー
+ssh サーバ名 dd if=/hoge/hoge.html | ssh サーバ名 dd of=/hoge2/hoge2.html
 
