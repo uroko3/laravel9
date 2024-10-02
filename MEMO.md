@@ -275,3 +275,50 @@ rsync -auvz --delete -e ssh '/hoge/hoge.html' 'host:/hoge2/hoge2.html'
 ▼ssh + dd でファイルコピー
 ssh サーバ名 dd if=/hoge/hoge.html | ssh サーバ名 dd of=/hoge2/hoge2.html
 
+▼リスナーの登録
+▽リスナー作成
+php artisan make:listener TestListener
+
+app/Listeners/TestListener.phpにリスナーができる
+
+-------TestListener.php--------
+public function handle($event)
+{
+        dd('call TestListener'); // とりあえずddを追加
+}
+-------------------------------
+
+リスナーをEventServiceProvider.phpに登録
+
+↓Logout時にTestListenerを実行するようにしてみる
+-------------------------------
+use Illuminate\Auth\Events\Logout;
+use App\Listeners\TestListener;
+
+class EventServiceProvider extends ServiceProvider
+{
+    /**
+     * The event listener mappings for the application.
+     *
+     * @var array<class-string, array<int, class-string>>
+     */
+    protected $listen = [
+        Registered::class => [
+            SendEmailVerificationNotification::class,
+        ],
+        Logout::class => [
+            TestListener::class,
+        ],
+    ];
+
+    /**
+     * Register any events for your application.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        //
+    }
+}
+-------------------------------
