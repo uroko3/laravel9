@@ -307,7 +307,8 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         Logout::class => [
-            TestListener::class,
+            TestListener::class, // 指定したクラスのhandlerメソッドが呼ばれる
+            [TestListener::class, 'handle2'], // メソッドを指定して実行する場合
         ],
     ];
 
@@ -322,3 +323,112 @@ class EventServiceProvider extends ServiceProvider
     }
 }
 -------------------------------
+
+▼イベントの作成とリスナー登録とイベント発火(dispatch)
+
+▽イベントの作成
+php artisan make:event TestEvent
+
+app/Events/TestEvent.phpにイベントができる
+
+---------------
+<?php
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class TestEvent
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+    
+    public $name; // 名前属性を追加してみる。
+
+    /**
+     * Create a new event instance.
+     *
+     * @return void
+     */
+    public function __construct(String $name) // コントローラでのディスパッチ時に値を受け取れる(TestEvent::dispatch('TEST')など)
+    {
+        $this->name = $name; // 名前属性にセット
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return \Illuminate\Broadcasting\Channel|array
+     */
+    public function broadcastOn()
+    {
+        return new PrivateChannel('channel-name');
+    }
+}
+-----------------
+
+▽リスナー登録
+
+とりあえず以下にhandle3を登録してみる
+app/Listeners/TestListener.php
+
+-----------------
+use App\Events\TestEvent; // Eventのuse忘れずに
+
+class TestListener
+{
+    /**
+     * Create the event listener.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     *
+     * @param  object  $event
+     * @return void
+     */
+    public function handle(Logout $event)
+    {
+        //dd('call TestListener', $event);
+    }
+    
+    public function handle2(Logout $event)
+    {
+        dd('call TestListener handle2', $event);
+    }
+    
+    public function handle3(TestEvent $event) // TestEventを引数に $event->nameなどでイベントに定義されている属性などにアクセスできる
+    {
+        dd('call TestListener handle2', $event->name, $event); // TestEventのメンバ変数nameにアクセスできる
+    }
+}
+-----------------
+
+▽イベントを発火させるにはコントローラなどで対象イベントをdispatchする必要がある
+
+適当なコントローラに対象イベントをuseし、対象アクションにイベントをディスパッチする。
+ディスパッチの際、イベントのコンストラクターに値を渡せる。（対象イベントのコンストラクターは別途実装必要）
+-----------------
+use App\Events\TestEvent;
+
+class UserController extends Controller
+{
+    public function index() {
+        $users = User::all();
+        
+        TestEvent::dispatch('てすと'); // TestEvent発火
+        
+        return view('user.index', compact('users'));
+    }
+-----------------

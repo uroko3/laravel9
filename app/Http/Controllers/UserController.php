@@ -6,10 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Hobby;
 
+use App\Events\TestEvent;
+
 class UserController extends Controller
 {
     public function index() {
         $users = User::all();
+        
+        TestEvent::dispatch('てすと'); // TestEvent発火
+        
         return view('user.index', compact('users'));
     }
     

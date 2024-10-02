@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Logout;
 use App\Listeners\TestListener;
 
+use App\Events\TestEvent;
+
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -22,8 +24,12 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         Logout::class => [
-            TestListener::class,
+            TestListener::class, // 指定したクラスのhandlerメソッドが呼ばれる
+            [TestListener::class, 'handle2'], // メソッドを指定して実行する場合
         ],
+        TestEvent::class => [
+            [TestListener::class, 'handle3'], // 予めコントローラでTestEventをディスパッチする必要あり
+        ]
     ];
 
     /**
